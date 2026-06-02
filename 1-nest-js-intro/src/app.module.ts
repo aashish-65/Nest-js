@@ -5,10 +5,9 @@ import { UsersModule } from './users/users.module';
 import { TweetModule } from './tweet/tweet.module';
 import { PaymentModule } from './payment/payment.module';
 import { OrdersModule } from './orders/orders.module';
-import { TweetrController } from './tweetr/tweetr.controller';
 @Module({
   imports: [UsersModule, TweetModule, PaymentModule, OrdersModule],
-  controllers: [AppController, TweetrController],
+  controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
