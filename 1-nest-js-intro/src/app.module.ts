@@ -3,29 +3,28 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { TweetModule } from './tweet/tweet.module';
-import { PaymentModule } from './payment/payment.module';
-import { OrdersModule } from './orders/orders.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
+import { ProfileModule } from './profile/profile.module';
 @Module({
   imports: [
     UsersModule,
     TweetModule,
-    PaymentModule,
-    OrdersModule,
     TypeOrmModule.forRootAsync({
-      imports: [],
-      inject: [],
       useFactory: () => ({
         type: 'mysql',
-        entities: [],
+        // entities: [User],
+        autoLoadEntities: true,
         synchronize: true,
         host: 'localhost',
         port: 3306,
         username: 'root',
-        password: '123456',
-        database: 'nestjs',
+        password: '',
+        database: 'nest-js',
       }),
     }),
+    AuthModule,
+    ProfileModule,
   ],
   controllers: [AppController],
   providers: [AppService],

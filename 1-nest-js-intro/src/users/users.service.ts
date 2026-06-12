@@ -1,23 +1,80 @@
-export class UsersService{
-    users: {id: number, name: string, age: number, gender: string, isMarried: boolean}[] = [
-        {
-            id: 1, name: 'jhon', age: 28, gender: 'male', isMarried: false
-        },
-        {
-            id: 2,name: 'mark', age: 32, gender: 'male', isMarried: true
-        }
-    ]
+import { Injectable } from '@nestjs/common';
+import { Repository } from 'typeorm';
+import { User } from './user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { CreateUserDto } from './dtos/create-user.dto';
+import { Profile } from '../profile/profile.entity';
 
-    getAllUsers(){
-        return this.users;
-    }
+@Injectable()
+export class UsersService {
+  constructor(
+    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Profile) private profileRepository: Repository<Profile>,
+  ) {}
 
-    getUserById(id: number){
-        return  this.users.find(x => x.id === id);
-    }
+  public async getAllUsers() {
+    // return await this.userRepository.find({
+    //   relations: {
+    //     profile: true,
+    //   },
+    // }); this is one way of implementing eager loading. Another way is adding a eager oprion in the user entity to true.
+    return await this.userRepository.find({
+      relations: {
+        profile: true,
+      },
+    });
+  }
 
-    createUser(user: {id: number, name: string, age: number, gender: string, isMarried: boolean}){
-        this.users.push(user);
-        return this.users;
-    }
+  public async createUser(userDto: CreateUserDto) {
+    // const user = this.userRepository.findOne({
+    //   where: { email: userDto.email },
+    // });
+    // console.log('User: ', await user);
+
+    // if (await user) {
+    //   console.log(1);
+    //   return 'The user with the given email already exists';
+    // }
+
+    // let newUser = this.userRepository.create(userDto);
+    // console.log('New User Obj: ', newUser);
+    // newUser = await this.userRepository.save(newUser);
+    // console.log('New User: ', newUser);
+    // return newUser;
+
+    //Create a Profile & Save
+    userDto.profile = userDto.profile ?? {};
+    // let profile = this.profileRepository.create(userDto.profile);
+    // await this.profileRepository.save(profile);
+
+    //Create User Object
+    let user = this.userRepository.create(userDto);
+
+    //Set the Profile
+    // user.profile = profile;
+
+    //Save the User Object
+    return await this.userRepository.save(user);
+  }
+
+  public async deleteUser(id: number) {
+    // Find the user for the given id.
+    // let user = await this.userRepository.findOneBy({ id });
+    // console.log(user);
+
+    //Delete User
+    await this.userRepository.delete(id);
+
+    //Delete Profile.
+    // if (user && user.profile) {
+    //   await this.profileRepository.delete(user.profile.id);
+    // }
+
+    //Sent a Response.
+    return { deleted: true };
+  }
+
+  public async findUserById(id: number) {
+    return await this.userRepository.findOneBy({ id });
+  }
 }
